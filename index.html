@@ -153,6 +153,40 @@
   }
   .link-note .arrow { font-size:1.1rem; display:block; }
 
+  /* bloc auto-évaluation en haut */
+  .eval {
+    max-width: 760px; margin: 0 auto 42px; position: relative; z-index: 2;
+    background: #fbf8f1; border: 1.5px solid var(--spectator);
+    border-top: 6px solid var(--spectator); border-radius: 3px;
+    padding: 20px 22px 22px; box-shadow: 4px 5px 0 rgba(107,91,138,0.16);
+    opacity: 0; transform: translateY(18px);
+    animation: rise 0.7s cubic-bezier(.2,.8,.2,1) 0.02s forwards;
+  }
+  .eval .tag {
+    display:inline-block; font-family:'Spline Sans Mono',monospace;
+    font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase;
+    padding:3px 9px; border-radius:2px; background: var(--spectator); color:#fbf8f1; margin-bottom:12px;
+  }
+  .eval h3 { font-size:1.28rem; font-weight:600; color: var(--spectator); line-height:1.1; }
+  .eval .sub { font-style:italic; color:#5a5446; font-size:0.92rem; margin:4px 0 16px; }
+  .eval .results { display:grid; grid-template-columns:1fr 1px 1fr; gap:18px; }
+  .eval .res .lbl {
+    font-family:'Spline Sans Mono',monospace; font-size:0.6rem; letter-spacing:0.1em;
+    text-transform:uppercase; color: var(--spectator); display:block; margin-bottom:6px;
+    padding-bottom:4px; border-bottom:1px solid var(--hair);
+  }
+  .eval .res p { font-size:0.9rem; line-height:1.4; }
+  .eval .v-div { background: var(--hair); }
+  .eval .flow { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:2px; }
+  .eval .chip {
+    font-family:'Spline Sans Mono',monospace; font-size:0.66rem; letter-spacing:0.06em;
+    text-transform:uppercase; padding:3px 8px; border-radius:2px; border:1px solid var(--spectator);
+    color: var(--spectator);
+  }
+  .eval .chip.sol { background: var(--spectator); color:#fbf8f1; border-color:var(--spectator); }
+  .eval .flow .ar { color: var(--spectator); font-weight:600; }
+  .eval .via { margin-top:8px; font-style:italic; font-size:0.86rem; color:#5a5446; }
+
   footer {
     max-width:1100px; margin: 56px auto 0; text-align:center; position:relative; z-index:2;
     font-family:'Spline Sans Mono',monospace; font-size:0.66rem; letter-spacing:0.14em;
@@ -160,6 +194,8 @@
   }
 
   @media (max-width: 860px) {
+    .eval .results { grid-template-columns: 1fr; }
+    .eval .v-div { display:none; }
     .board { grid-template-columns: 1fr; gap: 20px; }
     .center { order: -1; padding-top:0; }
     .col-head { display:none; }
@@ -173,6 +209,28 @@
   <div class="eyebrow">Séquence · Posture de l'élève</div>
   <h1>La double bascule<span class="corp">Bascule de posture corporelle</span></h1>
 </header>
+
+<section class="eval">
+  <span class="tag">Auto-évaluation</span>
+  <h3>L'élève spectateur et son regard critique</h3>
+  <p class="sub">Ce que le retour réflexif permet d'évaluer</p>
+  <div class="results">
+    <div class="res">
+      <span class="lbl">Compétences sociales</span>
+      <p>Inscrites dans le parcours citoyen et le PEAC.</p>
+    </div>
+    <div class="v-div"></div>
+    <div class="res">
+      <span class="lbl">Dépassement</span>
+      <div class="flow">
+        <span class="chip">Obstacle</span>
+        <span class="ar">→</span>
+        <span class="chip sol">Solution</span>
+      </div>
+      <p class="via">Par le langage, avec le vocabulaire déjà approprié.</p>
+    </div>
+  </div>
+</section>
 
 <main class="board">
 
