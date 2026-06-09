@@ -1,302 +1,296 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Carte mentale — Bascule de posture</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --ink: #1a1d24;
-    --paper: #f4efe6;
-    --paper-line: #d9cfbb;
-    --author: #c4622d;      /* terre cuite — élève auteur */
-    --commissaire: #2d6b6b; /* sarcelle — élève commissaire */
-    --carnet: #8a6d3b;      /* ocre — carnet */
-    --spectator: #6b5b8a;   /* prune — spectateur */
-    --hair: #b8ac95;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Fraunces', Georgia, serif;
-    background: var(--paper);
-    background-image:
-      radial-gradient(circle at 12% 18%, rgba(196,98,45,0.06), transparent 40%),
-      radial-gradient(circle at 88% 82%, rgba(45,107,107,0.06), transparent 40%),
-      repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(138,108,59,0.07) 31px, rgba(138,108,59,0.07) 32px);
-    color: var(--ink);
-    min-height: 100vh;
-    padding: 40px 24px 80px;
-  }
-
-  .grain {
-    position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: 0.5;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    mix-blend-mode: multiply;
-  }
-
-  header {
-    max-width: 1100px; margin: 0 auto 50px; text-align: center;
-    position: relative; z-index: 2;
-  }
-  .eyebrow {
-    font-family: 'Spline Sans Mono', monospace;
-    font-size: 0.72rem; letter-spacing: 0.34em; text-transform: uppercase;
-    color: var(--carnet); margin-bottom: 14px;
-  }
-  h1 {
-    font-size: clamp(2.1rem, 5vw, 3.4rem); font-weight: 600; line-height: 1.02;
-    font-style: italic; letter-spacing: -0.01em;
-  }
-  h1 .corp { font-style: normal; display:block; font-size: 0.5em; letter-spacing: 0.08em; color: var(--author); margin-top: 6px; }
-
-  .board {
-    max-width: 1100px; margin: 0 auto; position: relative; z-index: 2;
-    display: grid; grid-template-columns: 1fr 0.9fr 1fr; gap: 28px;
-    align-items: start;
-  }
-
-  .col-head {
-    font-family: 'Spline Sans Mono', monospace;
-    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
-    text-align: center; padding-bottom: 10px; margin-bottom: 4px;
-    border-bottom: 1.5px dashed var(--hair);
-  }
-
-  .card {
-    background: #fbf8f1;
-    border: 1.5px solid var(--ink);
-    border-radius: 3px;
-    padding: 20px 20px 22px;
-    box-shadow: 4px 5px 0 rgba(26,29,36,0.12);
-    position: relative;
-    opacity: 0; transform: translateY(18px);
-    animation: rise 0.7s cubic-bezier(.2,.8,.2,1) forwards;
-  }
-  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
-
-  .card .tag {
-    display: inline-block; font-family: 'Spline Sans Mono', monospace;
-    font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
-    padding: 3px 9px; border-radius: 2px; color: #fbf8f1; margin-bottom: 12px;
-  }
-  .card h3 { font-size: 1.28rem; font-weight: 600; line-height: 1.1; margin-bottom: 4px; }
-  .card .sub { font-style: italic; color: #5a5446; font-size: 0.92rem; margin-bottom: 14px; }
-
-  .card ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
-  .card li {
-    font-size: 0.9rem; line-height: 1.35; padding-left: 18px; position: relative;
-  }
-  .card li::before {
-    content: ''; position: absolute; left: 2px; top: 8px;
-    width: 6px; height: 6px; border-radius: 50%; background: currentColor;
-  }
-  .card .vs {
-    font-family: 'Spline Sans Mono', monospace; font-weight: 500;
-    font-size: 0.82rem; color: var(--ink);
-    background: rgba(26,29,36,0.06); padding: 2px 6px; border-radius: 2px;
-  }
-  .card .carnet-note {
-    margin-top: 14px; padding-top: 12px; border-top: 1px dotted var(--hair);
-    font-style: italic; font-size: 0.86rem; color: var(--carnet);
-  }
-  .card .carnet-note b { font-style: normal; font-family:'Spline Sans Mono',monospace; font-size:0.66rem; letter-spacing:0.1em; text-transform:uppercase; display:block; margin-bottom:3px; color:#7a6230;}
-
-  /* couleurs par posture */
-  .author { border-color: var(--author); }
-  .author .tag { background: var(--author); }
-  .author h3 { color: var(--author); }
-  .author { animation-delay: 0.1s; }
-
-  .commissaire { border-color: var(--commissaire); }
-  .commissaire .tag { background: var(--commissaire); }
-  .commissaire h3 { color: var(--commissaire); }
-  .commissaire { animation-delay: 0.45s; }
-
-  /* centre : carnet + bascule */
-  .center { display:flex; flex-direction: column; gap: 22px; padding-top: 30px; }
-
-  .pivot {
-    background: var(--ink); color: var(--paper);
-    border-radius: 50%; aspect-ratio: 1; width: 168px; margin: 0 auto;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; box-shadow: 0 8px 24px rgba(26,29,36,0.28);
-    animation: rise 0.7s cubic-bezier(.2,.8,.2,1) 0.25s forwards; opacity: 0;
-  }
-  .pivot .ttl { font-style: italic; font-size: 1.05rem; line-height: 1.05; }
-  .pivot .corp { font-family:'Spline Sans Mono',monospace; font-size:0.58rem; letter-spacing:0.18em; text-transform:uppercase; margin-top:8px; color: var(--paper-line);}
-  .pivot .swing { font-size: 1.6rem; margin-top: 6px; animation: tilt 3s ease-in-out infinite; }
-  @keyframes tilt { 0%,100%{transform:rotate(-12deg);} 50%{transform:rotate(12deg);} }
-
-  .carnet {
-    background:
-      repeating-linear-gradient(0deg, transparent, transparent 21px, rgba(138,108,59,0.18) 21px, rgba(138,108,59,0.18) 22px),
-      #f6f0e2;
-    border: 1.5px solid var(--carnet); border-left: 6px solid var(--carnet);
-    border-radius: 3px; padding: 18px 18px 20px;
-    box-shadow: 3px 4px 0 rgba(138,108,59,0.18);
-    animation: rise 0.7s cubic-bezier(.2,.8,.2,1) 0.7s forwards; opacity: 0;
-  }
-  .carnet .tag { background: var(--carnet); color:#fbf8f1; display:inline-block; font-family:'Spline Sans Mono',monospace; font-size:0.62rem; letter-spacing:0.12em; text-transform:uppercase; padding:3px 9px; border-radius:2px; margin-bottom:12px;}
-  .carnet h3 { font-size:1.15rem; color: var(--carnet); margin-bottom: 12px; }
-  .carnet .split { display:flex; gap:12px; }
-  .carnet .half { flex:1; font-size:0.82rem; line-height:1.35; }
-  .carnet .half .lbl { font-family:'Spline Sans Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; color:#7a6230; display:block; margin-bottom:5px; padding-bottom:4px; border-bottom:1px solid var(--hair);}
-  .carnet .mid-divider { width:1px; background: var(--hair); }
-
-  /* flèche de liaison */
-  .link-note {
-    text-align:center; font-family:'Spline Sans Mono',monospace; font-size:0.64rem;
-    letter-spacing:0.16em; text-transform:uppercase; color:var(--carnet);
-  }
-  .link-note .arrow { font-size:1.1rem; display:block; }
-
-  /* bloc auto-évaluation en haut */
-  .eval {
-    max-width: 760px; margin: 0 auto 42px; position: relative; z-index: 2;
-    background: #fbf8f1; border: 1.5px solid var(--spectator);
-    border-top: 6px solid var(--spectator); border-radius: 3px;
-    padding: 20px 22px 22px; box-shadow: 4px 5px 0 rgba(107,91,138,0.16);
-    opacity: 0; transform: translateY(18px);
-    animation: rise 0.7s cubic-bezier(.2,.8,.2,1) 0.02s forwards;
-  }
-  .eval .tag {
-    display:inline-block; font-family:'Spline Sans Mono',monospace;
-    font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase;
-    padding:3px 9px; border-radius:2px; background: var(--spectator); color:#fbf8f1; margin-bottom:12px;
-  }
-  .eval h3 { font-size:1.28rem; font-weight:600; color: var(--spectator); line-height:1.1; }
-  .eval .sub { font-style:italic; color:#5a5446; font-size:0.92rem; margin:4px 0 16px; }
-  .eval .results { display:grid; grid-template-columns:1fr 1px 1fr; gap:18px; }
-  .eval .res .lbl {
-    font-family:'Spline Sans Mono',monospace; font-size:0.6rem; letter-spacing:0.1em;
-    text-transform:uppercase; color: var(--spectator); display:block; margin-bottom:6px;
-    padding-bottom:4px; border-bottom:1px solid var(--hair);
-  }
-  .eval .res p { font-size:0.9rem; line-height:1.4; }
-  .eval .v-div { background: var(--hair); }
-  .eval .flow { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:2px; }
-  .eval .chip {
-    font-family:'Spline Sans Mono',monospace; font-size:0.66rem; letter-spacing:0.06em;
-    text-transform:uppercase; padding:3px 8px; border-radius:2px; border:1px solid var(--spectator);
-    color: var(--spectator);
-  }
-  .eval .chip.sol { background: var(--spectator); color:#fbf8f1; border-color:var(--spectator); }
-  .eval .flow .ar { color: var(--spectator); font-weight:600; }
-  .eval .via { margin-top:8px; font-style:italic; font-size:0.86rem; color:#5a5446; }
-
-  footer {
-    max-width:1100px; margin: 56px auto 0; text-align:center; position:relative; z-index:2;
-    font-family:'Spline Sans Mono',monospace; font-size:0.66rem; letter-spacing:0.14em;
-    text-transform:uppercase; color:#8a8270;
-  }
-
-  @media (max-width: 860px) {
-    .eval .results { grid-template-columns: 1fr; }
-    .eval .v-div { display:none; }
-    .board { grid-template-columns: 1fr; gap: 20px; }
-    .center { order: -1; padding-top:0; }
-    .col-head { display:none; }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire - Contacts & Documents</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-<div class="grain"></div>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
 
-<header>
-  <div class="eyebrow">Séquence · Posture de l'élève</div>
-  <h1>La double bascule<span class="corp">Bascule de posture corporelle</span></h1>
-</header>
-
-<section class="eval">
-  <span class="tag">Auto-évaluation</span>
-  <h3>L'élève spectateur et son regard critique</h3>
-  <p class="sub">Ce que le retour réflexif permet d'évaluer</p>
-  <div class="results">
-    <div class="res">
-      <span class="lbl">Compétences sociales</span>
-      <p>Inscrites dans le parcours citoyen et le PEAC.</p>
-    </div>
-    <div class="v-div"></div>
-    <div class="res">
-      <span class="lbl">Dépassement</span>
-      <div class="flow">
-        <span class="chip">Obstacle</span>
-        <span class="ar">→</span>
-        <span class="chip sol">Solution</span>
-      </div>
-      <p class="via">Par le langage, avec le vocabulaire déjà approprié.</p>
-    </div>
-  </div>
-</section>
-
-<main class="board">
-
-  <!-- COLONNE GAUCHE : AUTEUR -->
-  <section>
-    <article class="card author">
-      <span class="tag">Séance 1</span>
-      <h3>L'élève auteur</h3>
-      <p class="sub">L'intention qui se cherche</p>
-      <ul>
-        <li>L'élève <b>auteur</b> <span class="vs">vs</span> l'élève <b>spectateur</b></li>
-        <li><b>Intention</b> <span class="vs">vs</span> regard critique</li>
-        <li>Il porte un projet, en assume les choix plastiques</li>
-      </ul>
-      <div class="carnet-note">
-        <b>Trace sur le carnet</b>
-        Cheminement du projet — de l'intention à l'idée.
-      </div>
-    </article>
-  </section>
-
-  <!-- CENTRE : PIVOT + CARNET -->
-  <section class="center">
-    <div class="pivot">
-      <span class="ttl">Bascule<br>de posture</span>
-      <span class="swing">⇄</span>
-    </div>
-
-    <div class="carnet">
-      <span class="tag">Pivot réflexif</span>
-      <h3>Carnet de travail</h3>
-      <div class="split">
-        <div class="half">
-          <span class="lbl">Séance 1</span>
-          Cheminement du processus de réalisation artistique par l'élève auteur.
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div class="mb-6 text-center md:text-left md:flex md:items-center md:justify-between border-b border-gray-200 pb-5">
+          <div>
+              <h1 class="text-3xl font-bold text-indigo-950 tracking-tight flex items-center justify-center md:justify-start gap-3">
+                  <i class="fa-solid fa-folder-tree text-indigo-600"></i>
+                  Espace d'Administration
+              </h1>
+              <p class="mt-1 text-sm text-gray-500">Visualisation des contacts, devis et factures en temps réel.</p>
+          </div>
+          <div class="mt-4 md:mt-0">
+              <span id="global-counter" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 shadow-sm">
+                  Chargement...
+              </span>
+          </div>
         </div>
-        <div class="mid-divider"></div>
-        <div class="half">
-          <span class="lbl">Séance 2</span>
-          Cheminement de la scénographie de la production du camarade par l'élève commissaire.
+
+        <div class="border-b border-gray-200 mb-6">
+            <nav class="flex space-x-8" aria-label="Tabs">
+                <button id="btn-tab-contacts" onclick="switchTab('contacts')" 
+                        class="border-b-2 border-indigo-600 text-indigo-600 px-1 pb-4 text-sm font-medium flex items-center gap-2 focus:outline-none transition-all">
+                    <i class="fa-solid fa-address-book"></i> Contacts
+                </button>
+                <button id="btn-tab-documents" onclick="switchTab('documents')" 
+                        class="border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 px-1 pb-4 text-sm font-medium flex items-center gap-2 focus:outline-none transition-all">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> Factures & Devis
+                </button>
+            </nav>
         </div>
-      </div>
+
+        <div class="mb-6 bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+            <div class="relative rounded-md shadow-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                </div>
+                <input type="text" id="search-input" oninput="handleSearch()"
+                       class="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-all placeholder-gray-400" 
+                       placeholder="Rechercher dans l'onglet actif...">
+            </div>
+        </div>
+
+        <div id="loading-state" class="flex flex-col items-center justify-center py-16">
+            <svg class="animate-spin h-10 w-10 text-indigo-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-gray-500 font-medium">Synchronisation avec Google Sheets...</p>
+        </div>
+
+        <div id="error-state" class="hidden bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl mb-6 shadow-sm">
+            <div class="flex">
+                <div class="flex-shrink-0"><i class="fa-solid fa-circle-exclamation text-red-500 text-xl"></i></div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-semibold text-red-800">Erreur de liaison</h3>
+                    <p id="error-message" class="mt-1 text-sm text-red-700"></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="empty-state" class="hidden text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100">
+            <i class="fa-solid fa-box-open text-gray-300 text-5xl mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900">Aucun élément trouvé</h3>
+            <p class="mt-1 text-sm text-gray-500">Modifiez les termes de votre recherche ou vérifiez vos feuilles de calcul.</p>
+        </div>
+
+        <div id="container-contacts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+            </div>
+
+        <div id="container-documents" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+            </div>
+
     </div>
-  </section>
 
-  <!-- COLONNE DROITE : COMMISSAIRE -->
-  <section>
-    <article class="card commissaire">
-      <span class="tag">Séance 2</span>
-      <h3>L'élève commissaire</h3>
-      <p class="sub">Le regard qui met en valeur</p>
-      <ul>
-        <li>L'élève auteur <b>devient</b> élève spectateur</li>
-        <li>L'élève spectateur <span class="vs">vs</span> l'élève <b>commissaire d'exposition</b></li>
-        <li>Il scénographie la production d'un camarade</li>
-      </ul>
-      <div class="carnet-note">
-        <b>Trace sur le carnet</b>
-        Les apports externes de la scénographie.
-      </div>
-    </article>
-  </section>
+    <script>
+        // /!\ METTEZ ICI VOTRE URL DE WEB APP OBTENUE APRÈS LE NOUVEAU DÉPLOIEMENT
+        const WEB_APP_URL = "VOTRE_URL_WEB_APP_ICI";
 
-</main>
+        // Données globales chargées en mémoire
+        let store = { contacts: [], documents: [] };
+        let activeTab = 'contacts'; // 'contacts' ou 'documents'
 
-<footer>Carte mentale · de l'intention à la scénographie</footer>
+        // Au démarrage
+        window.addEventListener('DOMContentLoaded', loadAllData);
 
+        async function loadAllData() {
+            if (WEB_APP_URL === "VOTRE_URL_WEB_APP_ICI") {
+                showError("Veuillez configurer la constante WEB_APP_URL avec votre adresse de déploiement Google Apps Script.");
+                return;
+            }
+            try {
+                toggleLoading(true);
+                const response = await fetch(WEB_APP_URL, { method: 'GET', redirect: 'follow' });
+                if (!response.ok) throw new Error(`Erreur HTTP : ${response.status}`);
+                
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+
+                store.contacts = data.contacts || [];
+                store.documents = data.documents || [];
+                
+                toggleLoading(false);
+                renderActiveTab();
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        // Basculer visuellement et logiquement d'un onglet à l'être
+        function switchTab(tabName) {
+            activeTab = tabName;
+            document.getElementById('search-input').value = ''; // Réinitialise la recherche à chaque changement d'onglet
+            
+            const btnContacts = document.getElementById('btn-tab-contacts');
+            const btnDocs = document.getElementById('btn-tab-documents');
+            
+            if (activeTab === 'contacts') {
+                btnContacts.className = "border-b-2 border-indigo-600 text-indigo-600 px-1 pb-4 text-sm font-medium flex items-center gap-2 focus:outline-none transition-all";
+                btnDocs.className = "border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 px-1 pb-4 text-sm font-medium flex items-center gap-2 focus:outline-none transition-all";
+                document.getElementById('search-input').placeholder = "Rechercher une organisation, un nom, un email...";
+            } else {
+                btnDocs.className = "border-b-2 border-indigo-600 text-indigo-600 px-1 pb-4 text-sm font-medium flex items-center gap-2 focus:outline-none transition-all";
+                btnContacts.className = "border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 px-1 pb-4 text-sm font-medium flex items-center gap-2 focus:outline-none transition-all";
+                document.getElementById('search-input').placeholder = "Rechercher par titre de document, type (Devis, Facture)...";
+            }
+            renderActiveTab();
+        }
+
+        // Gérer le filtrage en direct
+        function handleSearch() {
+            renderActiveTab();
+        }
+
+        // Moteur de rendu
+        function renderActiveTab() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const containerContacts = document.getElementById('container-contacts');
+            const containerDocs = document.getElementById('container-documents');
+            const emptyState = document.getElementById('empty-state');
+            
+            containerContacts.classList.add('hidden');
+            containerDocs.classList.add('hidden');
+            emptyState.classList.add('hidden');
+
+            if (activeTab === 'contacts') {
+                containerContacts.classList.remove('hidden');
+                const filtered = store.contacts.filter(c => 
+                    (c.organisation && c.organisation.toLowerCase().includes(query)) ||
+                    (c.nom && c.nom.toLowerCase().includes(query)) ||
+                    (c.email && c.email.toLowerCase().includes(query)) ||
+                    (c.mobile && c.mobile.toLowerCase().includes(query)) ||
+                    (c.siret && c.siret.toLowerCase().includes(query))
+                );
+                displayContacts(filtered);
+                updateCounter(`${filtered.length} contact${filtered.length > 1 ? 's' : ''} trouvé(s)`);
+            } else {
+                containerDocs.classList.remove('hidden');
+                const filtered = store.documents.filter(d => 
+                    (d.titre && d.titre.toLowerCase().includes(query)) ||
+                    (d.type && d.type.toLowerCase().includes(query)) ||
+                    (d.id && d.id.toLowerCase().includes(query))
+                );
+                displayDocuments(filtered);
+                updateCounter(`${filtered.length} document${filtered.length > 1 ? 's' : ''} filtré(s)`);
+            }
+        }
+
+        // Affichage des cartes contacts
+        function displayContacts(list) {
+            const target = document.getElementById('container-contacts');
+            target.innerHTML = '';
+            if(list.length === 0) { document.getElementById('empty-state').classList.remove('hidden'); return; }
+            
+            list.forEach(c => {
+                const div = document.createElement('div');
+                div.className = "bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col justify-between";
+                div.innerHTML = `
+                    <div>
+                        <div class="flex items-start justify-between mb-2">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-indigo-50 text-indigo-700 truncate max-w-[80%]">
+                                <i class="fa-solid fa-building mr-1"></i> ${escapeHtml(c.organisation) || 'Sans entité'}
+                            </span>
+                            <span class="text-xs font-mono text-gray-300">#${escapeHtml(c.id)}</span>
+                        </div>
+                        <h2 class="text-base font-bold text-gray-900 mb-3">${escapeHtml(c.nom) || 'Nom inconnu'}</h2>
+                        <div class="space-y-1.5 text-sm text-gray-600 border-t border-gray-50 pt-2">
+                            ${c.mobile ? `<p><i class="fa-solid fa-phone text-gray-400 w-4 mr-1"></i> <a href="tel:${c.mobile}" class="hover:text-indigo-600">${escapeHtml(c.mobile)}</a></p>`:''}
+                            ${c.email ? `<p class="truncate"><i class="fa-solid fa-envelope text-gray-400 w-4 mr-1"></i> <a href="mailto:${c.email}" class="hover:text-indigo-600">${escapeHtml(c.email)}</a></p>`:''}
+                        </div>
+                    </div>
+                `;
+                target.appendChild(div);
+            });
+        }
+
+        // Affichage des cartes documents (Devis / Factures)
+        function displayDocuments(list) {
+            const target = document.getElementById('container-documents');
+            target.innerHTML = '';
+            if(list.length === 0) { document.getElementById('empty-state').classList.remove('hidden'); return; }
+
+            list.forEach(d => {
+                const isDevis = d.type === "Devis";
+                // Style du badge selon le type
+                const badgeClass = isDevis ? "bg-cyan-50 text-cyan-700 border-cyan-200" : "bg-emerald-50 text-emerald-700 border-emerald-200";
+                const iconClass = isDevis ? "fa-file-signature" : "fa-file-invoice";
+
+                const div = document.createElement('div');
+                div.className = "bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col justify-between transition-all hover:shadow-md";
+                div.innerHTML = `
+                    <div>
+                        <div class="flex items-start justify-between mb-3">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeClass}">
+                                <i class="fa-solid ${iconClass} mr-1.5"></i> ${d.type}
+                            </span>
+                            <span class="text-xs font-mono text-gray-300">#${escapeHtml(d.id)}</span>
+                        </div>
+                        <h2 class="text-base font-semibold text-gray-900 mb-4 line-clamp-2" title="${escapeHtml(d.titre)}">
+                            ${escapeHtml(d.titre) || 'Document sans titre'}
+                        </h2>
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                        <a href="${escapeHtml(d.url)}" target="_blank" 
+                           class="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-lg transition-colors">
+                            <i class="fa-solid fa-file-pdf text-sm"></i> Voir le PDF
+                        </a>
+                        <button onclick="confirmDeleteDocument('${escapeHtml(d.id)}', '${escapeHtml(d.titre)}')" 
+                                class="inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:text-white hover:bg-red-600 border border-transparent hover:border-red-700 px-3 py-2 rounded-lg transition-all">
+                            <i class="fa-solid fa-trash-can"></i> Supprimer
+                        </button>
+                    </div>
+                `;
+                target.appendChild(div);
+            });
+        }
+
+        // Action de suppression
+        async function confirmDeleteDocument(id, title) {
+            const check = confirm(`⚠️ ATTENTION ⚠️\n\nÊtes-vous sûr de vouloir supprimer le document suivant :\n"${title}" ?\n\nCette action va effacer définitivement sa ligne correspondante dans le fichier Google Sheets.`);
+            if (!check) return;
+
+            try {
+                toggleLoading(true);
+                // Appel en GET avec action passée en paramètre pour simplifier et contourner les blocages CORS AppScript.
+                const url = `${WEB_APP_URL}?action=deleteDocument&id=${encodeURIComponent(id)}`;
+                
+                const response = await fetch(url, { method: 'GET', redirect: 'follow' });
+                if(!response.ok) throw new Error("Échec technique de communication.");
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert("Succès : Le document a bien été retiré de la base de données.");
+                    // Mise à jour de la mémoire locale sans recharger toute l'API
+                    store.documents = store.documents.filter(doc => doc.id !== id);
+                    toggleLoading(false);
+                    renderActiveTab();
+                } else {
+                    throw new Error(result.error || "Raison inconnue.");
+                }
+            } catch (err) {
+                toggleLoading(false);
+                alert("Erreur lors de la suppression : " + err.message);
+            }
+        }
+
+        // Outils utilitaires
+        function toggleLoading(show) {
+            document.getElementById('loading-state').className = show ? "flex flex-col items-center justify-center py-16" : "hidden";
+        }
+        function updateCounter(text) {
+            document.getElementById('global-counter').textContent = text;
+        }
+        function showError(msg) {
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('error-state').classList.remove('hidden');
+            document.getElementById('error-message').textContent = msg;
+        }
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+    </script>
 </body>
 </html>
